@@ -1,0 +1,27 @@
+{
+  "name": "skillset",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @skillset/shared && npm run build -w @skillset/server && npm run build -w @skillset/web && npm run build -w @skillset/cli",
+    "dev": "npm run dev -w @skillset/cli --",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck -w @skillset/shared && npm run typecheck -w @skillset/server && npm run typecheck -w @skillset/web && npm run typecheck -w @skillset/cli"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

@@ -1,10 +1,11 @@
 # Product One Pager: SkillSet V2
 
-Generated: 2026-05-06
+Generated: 2026-05-06  
+Updated: 2026-05-08
 
 ## One-Liner
 
-SkillSet is a local manager for Claude Code and AI agent skills: see what is installed, understand what each skill does, disable noisy skills, group skills into profiles, and keep your agent setup usable as it grows.
+SkillSet is a local web app for Claude Code and AI agent skills: see what is installed, understand what each skill does, quiet noisy skills, group skills into profiles, and keep your agent setup usable as it grows.
 
 ## Problem
 
@@ -51,7 +52,7 @@ The product should answer four questions:
 
 ## Product
 
-SkillSet starts as a local-first terminal UI and CLI.
+SkillSet starts as a local-first web app launched by a CLI.
 
 Primary command:
 
@@ -59,24 +60,22 @@ Primary command:
 skillset
 ```
 
-This opens a local dashboard:
+This starts a local server on `127.0.0.1`, opens a browser UI, watches local skill folders, and serves a dashboard:
 
 ```text
-Installed Skills: 143
+Library
 
-Active:      91
-Disabled:   52
-Broken:      9
-Overlapping: 18
-High-risk:   6
+Installed skills: 143
+Health findings: 64
+Watched roots: 2
 
-Profiles:
-- Minimal
+Categories:
 - Frontend
+- Design & UX
+- Testing & QA
 - Code Review
-- Shipping
-- Product Planning
-- Full Power
+- DevOps & Deploy
+- Docs & Writing
 ```
 
 ## Core Features
@@ -93,6 +92,7 @@ For each skill, show:
 
 - name
 - description
+- inferred category
 - install location
 - active/disabled state
 - referenced files
@@ -101,31 +101,22 @@ For each skill, show:
 - missing files
 - last modified date
 
-### 2. Enable / Disable Without Deleting
+### 2. Quiet / Visible Without Deleting
 
 Users should be able to remove a skill from the active agent context without losing it.
 
-Example commands:
+Initial UI actions:
 
-```bash
-skillset disable design-shotgun
-skillset enable review
-skillset disable --matching "deploy"
-```
+- Keep visible
+- Make quiet
 
-Implementation can start with a reversible local convention, such as moving disabled skills into a managed `.disabled/` folder or maintaining a SkillSet manifest that controls which skills are linked into the active directory.
+Implementation uses a reversible SkillSet manifest and a managed active directory. Original skill folders are preserved.
 
 ### 3. Profiles
 
 Profiles are the killer feature.
 
 Instead of keeping every skill active all the time, users can switch between small, intentional skill sets:
-
-```bash
-skillset profile create frontend
-skillset profile add frontend design-review qa benchmark
-skillset profile use frontend
-```
 
 Example profiles:
 
@@ -140,10 +131,6 @@ Profiles make large skill systems usable. They also become shareable artifacts l
 ### 4. Skill Inspection
 
 Users can inspect a skill before deciding whether to keep it active.
-
-```bash
-skillset inspect qa
-```
 
 The inspection view should show:
 
@@ -171,12 +158,6 @@ The goal is not perfect model telemetry. The first version can use names, descri
 
 ### 6. Broken Skill Detection
 
-Run a local check:
-
-```bash
-skillset check
-```
-
 Detect:
 
 - missing `SKILL.md`
@@ -191,7 +172,7 @@ This gives immediate value even before any public directory exists.
 
 ## Product Shape
 
-Start with a terminal UI, not a web marketplace.
+Start with a local web app, not a web marketplace.
 
 Why:
 
@@ -199,20 +180,26 @@ Why:
 - The user is technical.
 - The tool needs filesystem access.
 - Privacy matters.
-- A terminal UI can ship faster than a polished desktop app.
+- A browser UI is better for scanning, filtering, categorizing, and inspecting 50-150 skills.
+- A desktop wrapper is not worth the packaging cost before product-market fit.
 
-CLI commands should exist for automation:
+The CLI remains the launcher and future automation surface:
 
 ```bash
-skillset list
-skillset check
-skillset inspect <skill>
-skillset enable <skill>
-skillset disable <skill>
-skillset profile create <name>
-skillset profile use <name>
-skillset profile export <name>
+skillset
+skillset --no-open
+skillset --port 4317
+skillset --cwd /path/to/project
 ```
+
+The Library should be the default surface:
+
+- full-width table
+- inferred category grouping
+- health/visibility badges
+- search and filters
+- row click opens a detail drawer
+- confirmations only for write actions
 
 ## Narrowest Wedge
 
@@ -229,7 +216,7 @@ After SkillSet:
 18 overlapping trigger descriptions found.
 6 risky/scripted skills flagged.
 5 workflow profiles created.
-Active skill set reduced from 143 to 24.
+Visible skill set reduced from 143 to 24.
 ```
 
 That is a clearer value proposition than "install more skills."
@@ -244,7 +231,7 @@ The ecosystem is already showing the symptoms:
 - users curate private skill folders
 - large bundles contain too many skills to reason about manually
 - reliability depends heavily on trigger descriptions
-- there is no standard local manager for active/inactive skills and workflow profiles
+- there is no standard local manager for visible/quiet skills and workflow profiles
 
 This is the same pattern every extension ecosystem hits: once installation is easy enough, organization becomes the next pain.
 
@@ -256,7 +243,7 @@ Unlike a marketplace, SkillSet starts from the skills already on your machine.
 
 Unlike a static curated list, SkillSet shows what is broken, duplicated, risky, or active in your actual setup.
 
-Unlike manual folder management, SkillSet gives you profiles, inspection, checks, and reversible enable/disable controls.
+Unlike manual folder management, SkillSet gives you profiles, inspection, checks, and reversible visibility controls.
 
 ## Open-Source Strategy
 
@@ -266,13 +253,13 @@ The open-source wedge:
 
 1. Make it work on the maintainer's own overloaded skill setup.
 2. Publish before/after screenshots of the local dashboard.
-3. Invite Claude Code power users to run `skillset check`.
+3. Invite Claude Code power users to run the local web app.
 4. Let users share anonymized stats voluntarily:
    - number of installed skills
    - broken skills
    - overlaps found
    - risky/scripted skills
-   - active skills after cleanup
+   - visible skills after cleanup
 5. Use those reports to improve checks and build credibility.
 
 The project should win trust by being local-first and useful without an account.
@@ -300,15 +287,15 @@ It found:
 - 12 broken skills
 - 18 overlapping trigger descriptions
 - 6 risky/scripted skills
-- 52 skills I could safely disable
+- 52 skills I could safely make quiet
 
 Now I switch profiles: Minimal, Frontend, Review, Shipping.
 ```
 
 The GTM loop:
 
-1. User runs `skillset check`.
-2. User sees a surprising local report.
+1. User runs `skillset`.
+2. User sees a surprising local Library and Health view.
 3. User shares the report or screenshot.
 4. Other power users run it on their setup.
 5. Common issues become better checks.
@@ -321,13 +308,13 @@ MVP must have:
 - scan global and project Claude Code skill directories
 - parse `SKILL.md`
 - show a local dashboard
-- list active and disabled skills
-- enable and disable skills reversibly
+- list visible and quiet skills
+- make skills visible or quiet reversibly
 - create and switch profiles
 - detect missing files and invalid skill structure
 - detect obvious overlapping descriptions
 - flag scripts and risky command patterns
-- export a local report
+- group skills by inferred category
 
 MVP can defer:
 
@@ -355,7 +342,7 @@ Product quality:
 
 - Works on a real large skill directory.
 - Does not destroy or lose user skills.
-- Every enable/disable action is reversible.
+- Every visibility action is reversible.
 - Reports explain exactly what was detected and why.
 - No account or network connection required for core use.
 
@@ -365,7 +352,7 @@ Telemetry gap:
 
 Claude Code may not expose reliable skill usage or trigger history. SkillSet should avoid depending on this at first. Static inspection and profile control are enough for v1.
 
-Disable semantics:
+Visibility semantics:
 
 Moving or linking skill folders can break user expectations. The implementation must be conservative, reversible, and clearly documented.
 
@@ -406,7 +393,7 @@ Use it to answer:
 - Which skills are broken?
 - Which skills overlap?
 - Which skills are risky or scripted?
-- Which 20 to 30 skills should stay active in a practical default profile?
-- How should enable/disable work without losing user data?
+- Which 20 to 30 skills should stay visible in a practical default profile?
+- How should visible/quiet control work without losing user data?
 
 If the prototype makes one messy skill folder understandable in under five minutes, the product has a real wedge.
